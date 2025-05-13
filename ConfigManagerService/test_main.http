@@ -1,0 +1,19 @@
+# Test your FastAPI endpoints
+
+PUT http://127.0.0.1:8000/update?id=idhere&content=
+Accept: application/json
+
+###
+# test with no version
+GET http://127.0.0.1:8000/provision?id=idhere
+Accept: application/json
+
+###
+# test with version
+GET http://127.0.0.1:8000/provision?id=idhere&version=2025-05-09_05-23-04
+Accept: application/json
+
+###
+
+GET http://192.168.68.56:8000//provision?id=7c8d9c2bab67
+Accept: application/json
