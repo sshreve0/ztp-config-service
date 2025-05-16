@@ -15,5 +15,10 @@ Accept: application/json
 
 ###
 
-GET http://192.168.30.10:8000//provision?id=7c8d9c14ec12
+GET http://192.168.30.10:8000/provision?id=7c8d9c14ec12
+Accept: application/json
+
+###
+
+PUT http://192.168.30.10:8000/update?id=7c8d9c14ec12&content=balls&version=0000-00-00_00-00-00
 Accept: application/json

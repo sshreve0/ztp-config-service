@@ -15,10 +15,13 @@ def get_ntp_time(server="time.nist.gov"):
     return datetime.fromtimestamp(response.tx_time).strftime("%Y-%m-%d_%H-%M-%S")
 
 @app.put("/update")
-async def update_config(id: str, content: str):
-    version = get_ntp_time()
+async def update_config(id: str, content: str, version: str):
+    #version = get_ntp_time()
 
     filepath = f"{CONFIG_DIR}/{id}/{version}/"
+
+    print(filepath)
+
     os.makedirs(filepath, exist_ok=True)
     filename = filepath + "/network.uci"
     with open(filename, "w") as outfile:
