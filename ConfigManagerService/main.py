@@ -18,23 +18,26 @@ def get_ntp_time(server="time.nist.gov"): # unused right now
 async def update_config(mac: str, version: str, content: str = Body()):
     filepath = f"{CONFIG_DIR}/{mac}/{version}/"
 
-    if not filepath:
-        raise HTTPException(status_code=404, detail="Config file not found")
+    if not os.path.exists(filepath):
+        raise HTTPException(status_code=404, detail="No directory found for mac: " + mac)
 
-    try:
-        os.makedirs(filepath, exist_ok=True)
-        filename = filepath + "/network.uci"
-        with open(filename, "w") as outfile:
-            outfile.write(content)
-    except Exception as e:
-        return HTTPException(status_code=500, detail=e)
+    os.makedirs(filepath, exist_ok=True)
+    filename = filepath + "/network.uci"
+    with open(filename, "w") as outfile:
+        outfile.write(content)
 
     return HTTPException(status_code=200)
 
 @app.get("/provision")
 async def provision_config(mac: str, version: str = None):
+
+    if not os.path.exists(f"{CONFIG_DIR}/{mac}/"):
+        raise HTTPException(status_code=404, detail="No directory found for mac: " + mac)
+
     if version is None:  # Gets latest version if none specified
         version_list = os.listdir(f"{CONFIG_DIR}/{mac}/")
+        if version_list.count == 0:
+            raise HTTPException(status_code=404, detail="No versions found for mac: " + mac)
 
         parsed_times = [datetime.strptime(ts, "%Y-%m-%d_%H-%M-%S") for ts in version_list]
 
@@ -42,9 +45,9 @@ async def provision_config(mac: str, version: str = None):
         version = latest_version.strftime("%Y-%m-%d_%H-%M-%S")
 
     filepath = f"{CONFIG_DIR}/{mac}/{version}/network.uci"
+    if not os.path.exists(filepath):
+        raise HTTPException(status_code=404, detail="Config not found.")
 
-    if not filepath:
-        raise HTTPException(status_code=404, detail="Config file not found")
 
     response = FileResponse(filepath, media_type="text/plain", filename=os.path.basename(filepath))
     response.headers["Config-Version"] = f"{version}"

@@ -1,24 +1,36 @@
 # Test your FastAPI endpoints
 
-PUT http://127.0.0.1:8000/update?id=idhere&content=
-Accept: application/json
-
 ###
 # test with no version
-GET http://127.0.0.1:8000/provision?id=idhere
+GET http://127.0.0.1:8000/provision?mac=7c8d9c14ec12
 Accept: application/json
 
 ###
 # test with version
-GET http://127.0.0.1:8000/provision?id=idhere&version=2025-05-09_05-23-04
+GET http://127.0.0.1:8000/provision?mac=idhere&version=2025-05-09_05-23-04
 Accept: application/json
 
 ###
 
-GET http://192.168.30.10:8000/provision?id=7c8d9c14ec12
+GET http://127.0.0.1:8000/provision?mac=7c8d9c14ec12
+Accept: application/json
+
+###
+# test successful return of newest version
+GET http://192.168.30.10:8000/provision?mac=7c8d9c14ec12
+Accept: application/json
+
+###
+# test failure to return of newest version
+GET http://192.168.30.10:8000/provision?mac=123456789
 Accept: application/json
 
 ###
 
-PUT http://192.168.30.10:8000/update?id=7c8d9c14ec12&content=balls&version=0000-00-00_00-00-00
+PUT http://192.168.30.10:8000/update?mac=7c8d9c14ec12&content=balls&version=0000-00-00_00-00-00
+Accept: application/json
+
+###
+# test update failure
+PUT http://192.168.30.10:8000/update?mac=1234567889&version=0000-00-00_00-00-00&content=balls
 Accept: application/json
