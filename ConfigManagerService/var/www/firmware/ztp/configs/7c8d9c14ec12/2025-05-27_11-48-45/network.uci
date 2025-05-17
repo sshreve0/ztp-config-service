@@ -42,6 +42,3 @@ set network.vxlan_iss.proto='static'
 set network.vxlan_iss.device='br-vx-is'
 set network.vxlan_iss.ipaddr='10.228.0.85'
 set network.vxlan_iss.netmask='255.255.0.0'
-
-commit system
-commit network

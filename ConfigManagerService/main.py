@@ -2,46 +2,46 @@ from datetime import datetime
 import ntplib
 import uvicorn
 import os
-from fastapi import FastAPI, HTTPException
+from fastapi import FastAPI, HTTPException, Body
 from starlette.responses import FileResponse
 
 CONFIG_DIR = "var/www/firmware/ztp/configs"
 
 app = FastAPI()
 
-def get_ntp_time(server="time.nist.gov"):
+def get_ntp_time(server="time.nist.gov"): # unused right now
     client = ntplib.NTPClient()
     response = client.request(server, version=3)
     return datetime.fromtimestamp(response.tx_time).strftime("%Y-%m-%d_%H-%M-%S")
 
 @app.put("/update")
-async def update_config(id: str, content: str, version: str):
-    #version = get_ntp_time()
+async def update_config(mac: str, version: str, content: str = Body()):
+    filepath = f"{CONFIG_DIR}/{mac}/{version}/"
 
-    filepath = f"{CONFIG_DIR}/{id}/{version}/"
+    if not filepath:
+        raise HTTPException(status_code=404, detail="Config file not found")
 
-    print(filepath)
+    try:
+        os.makedirs(filepath, exist_ok=True)
+        filename = filepath + "/network.uci"
+        with open(filename, "w") as outfile:
+            outfile.write(content)
+    except Exception as e:
+        return HTTPException(status_code=500, detail=e)
 
-    os.makedirs(filepath, exist_ok=True)
-    filename = filepath + "/network.uci"
-    with open(filename, "w") as outfile:
-        outfile.write(content)
-
-    return {"message": f"Update {id} with {content}"}
+    return HTTPException(status_code=200)
 
 @app.get("/provision")
-async def provision_config(id: str, version: str = None):
+async def provision_config(mac: str, version: str = None):
     if version is None:  # Gets latest version if none specified
-        version_list = os.listdir(f"{CONFIG_DIR}/{id}/")
-        print(version_list)
+        version_list = os.listdir(f"{CONFIG_DIR}/{mac}/")
 
         parsed_times = [datetime.strptime(ts, "%Y-%m-%d_%H-%M-%S") for ts in version_list]
 
         latest_version = max(parsed_times)
         version = latest_version.strftime("%Y-%m-%d_%H-%M-%S")
 
-    filepath = f"{CONFIG_DIR}/{id}/{version}/network.uci"
-    print(filepath)
+    filepath = f"{CONFIG_DIR}/{mac}/{version}/network.uci"
 
     if not filepath:
         raise HTTPException(status_code=404, detail="Config file not found")
