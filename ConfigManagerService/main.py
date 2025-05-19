@@ -4,6 +4,7 @@ import uvicorn
 import os
 from fastapi import FastAPI, HTTPException, Body
 from starlette.responses import FileResponse
+import uci_parser
 
 CONFIG_DIR = "var/www/firmware/ztp/configs"
 
@@ -16,17 +17,20 @@ def get_ntp_time(server="time.nist.gov"): # unused right now
 
 @app.put("/update")
 async def update_config(mac: str, version: str, content: str = Body()):
-    filepath = f"{CONFIG_DIR}/{mac}/{version}/"
+    filepath = f"{CONFIG_DIR}/{mac}/" #will never exist
+    content = uci_parser.parse_file(content)
 
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="No directory found for mac: " + mac)
 
-    os.makedirs(filepath, exist_ok=True)
-    filename = filepath + "/network.uci"
+    wholepath=f"{filepath}{version}/"
+
+    os.makedirs(wholepath, exist_ok=True)
+    filename = wholepath + "/network.uci"
     with open(filename, "w") as outfile:
         outfile.write(content)
 
-    return HTTPException(status_code=200)
+    return HTTPException(status_code=200,detail="Config successfully updated.")
 
 @app.get("/provision")
 async def provision_config(mac: str, version: str = None):
@@ -36,7 +40,7 @@ async def provision_config(mac: str, version: str = None):
 
     if version is None:  # Gets latest version if none specified
         version_list = os.listdir(f"{CONFIG_DIR}/{mac}/")
-        if version_list.count == 0:
+        if len(version_list) == 0:
             raise HTTPException(status_code=404, detail="No versions found for mac: " + mac)
 
         parsed_times = [datetime.strptime(ts, "%Y-%m-%d_%H-%M-%S") for ts in version_list]
