@@ -17,7 +17,7 @@ def get_ntp_time(server="time.nist.gov"): # unused right now
 
 @app.put("/update")
 async def update_config(mac: str, version: str, content: str = Body()):
-    filepath = f"{CONFIG_DIR}/{mac}/" #will never exist
+    filepath = f"{CONFIG_DIR}/{mac}/"
     content = uci.parse_file(content)
 
     if not os.path.exists(filepath):
