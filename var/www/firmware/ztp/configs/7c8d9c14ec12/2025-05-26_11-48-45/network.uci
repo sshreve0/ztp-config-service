@@ -30,7 +30,7 @@ set network.vxlan23075.peeraddr='10.255.250.210'
 set network.vxlan23075.port='4790'
 
 # VXLAN ISS Bridge
-set network.dev_iss='device
+set network.dev_iss='device'
 set network.dev_iss.type='bridge'
 set network.dev_iss.name='br-vx-iss'
 set network.dev_iss.bridge_empty='1'
