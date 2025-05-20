@@ -4,7 +4,7 @@ import uvicorn
 import os
 from fastapi import FastAPI, HTTPException, Body
 from starlette.responses import FileResponse
-import uci_parser
+import uci_parser as uci
 
 CONFIG_DIR = "var/www/firmware/ztp/configs"
 
@@ -18,7 +18,7 @@ def get_ntp_time(server="time.nist.gov"): # unused right now
 @app.put("/update")
 async def update_config(mac: str, version: str, content: str = Body()):
     filepath = f"{CONFIG_DIR}/{mac}/" #will never exist
-    content = uci_parser.parse_file(content)
+    content = uci.parse_file(content)
 
     if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="No directory found for mac: " + mac)
