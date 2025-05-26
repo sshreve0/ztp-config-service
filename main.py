@@ -1,4 +1,6 @@
 from datetime import datetime
+from multiprocessing.pool import worker
+
 import ntplib
 import uvicorn
 import os
@@ -6,7 +8,7 @@ from fastapi import FastAPI, HTTPException, Body
 from starlette.responses import FileResponse
 import uci_parser as uci
 
-CONFIG_DIR = "var/www/firmware/ztp/configs"
+CONFIG_DIR = "../mnt/var/www/firmware/ztp/configs"
 
 app = FastAPI()
 

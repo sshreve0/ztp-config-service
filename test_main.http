@@ -17,12 +17,32 @@ Accept: application/json
 
 ###
 # test successful return of newest version
-GET http://192.168.30.10:8000/provision?mac=7c8d9c14ec12
+GET https://192.168.80.110/provision
+Accept: application/json
+
+###
+# test successful return of newest version
+GET http://38.126.155.75/provision?mac=7c8d9c14ec12
+Accept: application/json
+
+###
+# test successful return of newest version
+GET https://firmware.itops.io/provision?mac=7c8d9c14ec12
+Accept: application/json
+
+###
+# test successful return of newest version
+GET https://firmware.itops.io/provision
+Accept: application/json
+
+###
+# test successful return of newest version
+GET http://38.126.155.75/provision?mac=7c8d9c14ec12
 Accept: application/json
 
 ###
 # test failure to return of newest version
-GET http://192.168.30.10:8000/provision?mac=123456789
+GET http://192.168.30.10:85/provision?mac=123456789
 Accept: application/json
 
 ###
