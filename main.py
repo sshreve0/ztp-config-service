@@ -1,8 +1,5 @@
 from datetime import datetime
-from multiprocessing.pool import worker
-
 import ntplib
-import uvicorn
 import os
 from fastapi import FastAPI, HTTPException, Body
 from starlette.responses import FileResponse
@@ -59,7 +56,3 @@ async def provision_config(mac: str, version: str = None):
     response.headers["Config-Version"] = f"{version}"
 
     return response
-
-
-if __name__ == "__main__":
-    uvicorn.run("main:app", host="0.0.0.0", port=8000, log_level="info")
