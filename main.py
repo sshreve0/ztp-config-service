@@ -4,6 +4,8 @@ import os
 from fastapi import FastAPI, HTTPException, Body
 from starlette.responses import FileResponse
 import uci_parser as uci
+import db
+import uvicorn #included for pipreqs
 
 CONFIG_DIR = "../mnt/var/www/firmware/ztp/configs"
 
@@ -16,7 +18,10 @@ def get_ntp_time(server="time.nist.gov"): # unused right now
 
 @app.put("/update")
 async def update_config(mac: str, version: str, content: str = Body()):
-    filepath = f"{CONFIG_DIR}/{mac}/"
+
+    loc = db.get_location_by_mac(mac)
+
+    filepath = f"{CONFIG_DIR}/{loc}/{mac}/"
     content = uci.parse_file(content)
 
     if not os.path.exists(filepath):
@@ -25,7 +30,7 @@ async def update_config(mac: str, version: str, content: str = Body()):
     wholepath=f"{filepath}{version}/"
 
     os.makedirs(wholepath, exist_ok=True)
-    filename = wholepath + "/network.uci"
+    filename = wholepath + "/configs.uci"
     with open(filename, "w") as outfile:
         outfile.write(content)
 
@@ -34,11 +39,15 @@ async def update_config(mac: str, version: str, content: str = Body()):
 @app.get("/provision")
 async def provision_config(mac: str, version: str = None):
 
-    if not os.path.exists(f"{CONFIG_DIR}/{mac}/"):
+    loc = db.get_location_by_mac(mac)
+
+    filepath = f"{CONFIG_DIR}/{loc}/{mac}/"
+
+    if not os.path.exists(filepath):
         raise HTTPException(status_code=404, detail="No directory found for mac: " + mac)
 
     if version is None:  # Gets latest version if none specified
-        version_list = os.listdir(f"{CONFIG_DIR}/{mac}/")
+        version_list = os.listdir(filepath)
         if len(version_list) == 0:
             raise HTTPException(status_code=404, detail="No versions found for mac: " + mac)
 
@@ -47,12 +56,15 @@ async def provision_config(mac: str, version: str = None):
         latest_version = max(parsed_times)
         version = latest_version.strftime("%Y-%m-%d_%H-%M-%S")
 
-    filepath = f"{CONFIG_DIR}/{mac}/{version}/network.uci"
-    if not os.path.exists(filepath):
+    fullpath = f"{filepath}/{version}/configs.uci"
+    if not os.path.exists(fullpath):
         raise HTTPException(status_code=404, detail="Config not found.")
 
 
-    response = FileResponse(filepath, media_type="text/plain", filename=os.path.basename(filepath))
+    response = FileResponse(fullpath, media_type="text/plain", filename=os.path.basename(fullpath))
     response.headers["Config-Version"] = f"{version}"
 
     return response
+
+#if __name__ == '__main__':
+#    uvicorn.run("main:app", host="0.0.0.0", port=8000, log_level="info")

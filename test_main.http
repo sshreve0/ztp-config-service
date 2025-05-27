@@ -6,13 +6,8 @@ GET http://127.0.0.1:8000/provision?mac=7c8d9c14ec12
 Accept: application/json
 
 ###
-# test with version
-GET http://127.0.0.1:8000/provision?mac=idhere&version=2025-05-09_05-23-04
-Accept: application/json
 
-###
-
-GET http://127.0.0.1:8000/provision?mac=7c8d9c14ec12
+GET http://127.0.0.1:8000/provision?mac=7c8d9c1f7a6e
 Accept: application/json
 
 ###
