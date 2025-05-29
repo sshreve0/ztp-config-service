@@ -1,20 +1,33 @@
 from datetime import datetime
+from typing import Annotated
+
 import ntplib
 import os
-from fastapi import FastAPI, HTTPException, Body
+from fastapi import FastAPI, HTTPException, Body, Depends
+from fastapi.security import OAuth2PasswordBearer
 from starlette.responses import FileResponse
 import uci_parser as uci
 import db
+import auth
 import uvicorn #included for pipreqs
 
 CONFIG_DIR = "../mnt/var/www/firmware/ztp/configs"
 
 app = FastAPI()
 
-def get_ntp_time(server="time.nist.gov"): # unused right now
+oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
+
+def get_ntp_time():
+    servers = ["time-a-b.nist.gov","time-b-b.nist.gov","time-c-b.nist.gov","time-d-b.nist.gov"]
+
     client = ntplib.NTPClient()
-    response = client.request(server, version=3)
-    return datetime.fromtimestamp(response.tx_time).strftime("%Y-%m-%d_%H-%M-%S")
+    for server in servers:
+        try:
+            response = client.request(server, version=3)
+            return datetime.utcfromtimestamp(response.tx_time)
+        except Exception as e:
+            print(f"Failed to get time from {server}: {e}")
+    raise RuntimeError("ERROR: All NTP servers failed.")
 
 @app.put("/update")
 async def update_config(mac: str, version: str, content: str = Body()):
@@ -37,7 +50,13 @@ async def update_config(mac: str, version: str, content: str = Body()):
     return HTTPException(status_code=200,detail="Config successfully updated.")
 
 @app.get("/provision")
-async def provision_config(mac: str, version: str = None):
+async def provision_config(token: Annotated[str, Depends(oauth2_scheme)],mac: str, version: str = None):
+
+    time = get_ntp_time().strftime("%Y-%m-%d_%H-%M")
+    authenticated = auth.verify(mac, token, time)
+
+    if not authenticated:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     loc = db.get_location_by_mac(mac)
 
@@ -59,7 +78,6 @@ async def provision_config(mac: str, version: str = None):
     fullpath = f"{filepath}/{version}/configs.uci"
     if not os.path.exists(fullpath):
         raise HTTPException(status_code=404, detail="Config not found.")
-
 
     response = FileResponse(fullpath, media_type="text/plain", filename=os.path.basename(fullpath))
     response.headers["Config-Version"] = f"{version}"

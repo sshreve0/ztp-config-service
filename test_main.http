@@ -2,7 +2,7 @@
 
 ###
 # test with no version
-GET http://127.0.0.1:8000/provision?mac=7c8d9c14ec12
+GET http://127.0.0.1:8000/provision?token=CVFedarGsdfvtrshDARFBGstrf&mac=7c8d9c14ec12
 Accept: application/json
 
 ###
@@ -22,7 +22,7 @@ Accept: application/json
 
 ###
 # test successful return of newest version
-GET https://firmware.itops.io/provision?mac=7c8d9c14ec12
+GET https://firmware.itops.io/provision?mac=7c8d9c1f7a6e
 Accept: application/json
 
 ###

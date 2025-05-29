@@ -12,9 +12,7 @@ def get_location_by_mac(mac):
         result = cur.fetchone()
 
         if result:
-            print(result)
             location = result[1]
-            print(location)
             return location
         else:
             return None
