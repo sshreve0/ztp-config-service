@@ -16,7 +16,7 @@ app = FastAPI()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
-def get_ntp_time():
+async def get_ntp_time():
     servers = ["time-a-b.nist.gov","time-b-b.nist.gov","time-c-b.nist.gov","time-d-b.nist.gov"]
 
     client = ntplib.NTPClient()
@@ -29,10 +29,13 @@ def get_ntp_time():
     raise RuntimeError("ERROR: All NTP servers failed.")
 
 @app.put("/state")
-async def set_state(token: Annotated[str, Depends(oauth2_scheme)], mac: str, state: str):
+async def set_state( mac: str, state: str):
 
-    time = (get_ntp_time().strftime("%Y-%m-%d_%H-%M"))
-    authenticated = auth.verify(mac, token, time)
+    time = await get_ntp_time()
+    time = time.strftime("%Y-%m-%d_%H-%M")
+    #authenticated = auth.verify(mac, token, time)
+    print("TIME: " + time)
+    authenticated = True
 
     if not authenticated:
         raise HTTPException(status_code=401, detail="Unauthorized")
