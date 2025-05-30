@@ -1,6 +1,5 @@
 from datetime import datetime
 from typing import Annotated
-
 import ntplib
 import os
 from fastapi import FastAPI, HTTPException, Body, Depends
@@ -9,7 +8,7 @@ from starlette.responses import FileResponse
 import uci_parser as uci
 import db
 import auth
-import uvicorn #included for pipreqs
+import uvicorn #included for testing
 
 CONFIG_DIR = "../mnt/var/www/firmware/ztp/configs"
 
@@ -29,8 +28,32 @@ def get_ntp_time():
             print(f"Failed to get time from {server}: {e}")
     raise RuntimeError("ERROR: All NTP servers failed.")
 
+@app.put("/state")
+async def set_state(token: Annotated[str, Depends(oauth2_scheme)], mac: str, state: str):
+
+    time = (get_ntp_time().strftime("%Y-%m-%d_%H-%M"))
+    authenticated = auth.verify(mac, token, time)
+
+    if not authenticated:
+        raise HTTPException(status_code=401, detail="Unauthorized")
+
+    print(state)
+    if state not in {"succeeded", "failed", "synced"}:
+        raise HTTPException(status_code=400, detail="Invalid state: " + state)
+
+    result = db.set_state(mac,state)
+    print(result)
+
+    return HTTPException(status_code=200,detail="Device state successfully updated.")
+
 @app.put("/update")
-async def update_config(mac: str, version: str, content: str = Body()):
+async def update_config(token: Annotated[str, Depends(oauth2_scheme)],mac: str, version: str, content: str = Body()):
+
+    time = (get_ntp_time().strftime("%Y-%m-%d_%H-%M"))
+    authenticated = auth.verify(mac, token, time)
+
+    if not authenticated:
+        raise HTTPException(status_code=401, detail="Unauthorized")
 
     loc = db.get_location_by_mac(mac)
 

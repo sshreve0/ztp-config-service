@@ -3,7 +3,7 @@ from pathlib import Path
 
 # Paths
 CONFIGS_ROOT = Path("../mnt/var/www/firmware/ztp/configs").resolve()
-DB_PATH = "../mnt/var/www/firmware/ztp/mac_registry.sqlite"
+DB_PATH = "../mnt/var/www/firmware/ztp/configs/mac_registry.sqlite"
 
 
 conn = sqlite3.connect(DB_PATH)
@@ -13,7 +13,8 @@ cur = conn.cursor()
 cur.execute("""
 CREATE TABLE IF NOT EXISTS devices (
     mac TEXT PRIMARY KEY,
-    location TEXT NOT NULL
+    location TEXT NOT NULL,
+    state TEXT NOT NULL
 )
 """)
 
@@ -26,7 +27,12 @@ for location_dir in CONFIGS_ROOT.iterdir():
         for mac_dir in location_dir.iterdir():
             if mac_dir.is_dir():
                 mac = mac_dir.name
-                cur.execute("INSERT OR REPLACE INTO devices VALUES (?, ?)", (mac, location))
+                cur.execute("SELECT * FROM devices WHERE mac = ?", (mac,))
+                exists = cur.fetchone()
+
+                if not exists:
+                    cur.execute("INSERT OR REPLACE INTO devices VALUES (?, ?, ?)", (mac, location, "unmatched"))
+
                 filesystem_macs.add(mac)
 
 # Cleanup stale MACs

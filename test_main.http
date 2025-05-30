@@ -7,7 +7,7 @@ Accept: application/json
 
 ###
 
-GET http://127.0.0.1:8000/provision?mac=7c8d9c1f7a6e
+PUT http://127.0.0.1:8000/state?mac=7c8d9c1f7a6e&state=balls
 Accept: application/json
 
 ###
