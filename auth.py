@@ -2,12 +2,12 @@ import hashlib
 
 token = 'CVFedarGsdfvtrshDARFBGstrf'
 
-def verify(mac,ap_hash,time):
+async def verify(mac,ap_hash,time):
 
-    str = mac +'!'+ token +'@'+ time
-    hash = hashlib.sha256(str.encode('utf-8')).hexdigest()
+    hashstr = mac +'!'+ token +'@'+ time
+    newhash = hashlib.sha256(hashstr.encode('utf-8')).hexdigest()
 
-    if ap_hash == hash:
+    if ap_hash == newhash:
         return True
     else:
         return False

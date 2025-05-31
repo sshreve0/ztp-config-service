@@ -1,6 +1,6 @@
 import sqlite3
 
-DB_PATH = "../mnt/var/www/firmware/ztp/configs/mac_registry.sqlite"
+DB_PATH = "../mnt/ztp/configs/mac_registry.sqlite"
 
 def get_connection():
     return sqlite3.connect(DB_PATH)

@@ -2,8 +2,8 @@ import sqlite3
 from pathlib import Path
 
 # Paths
-CONFIGS_ROOT = Path("../mnt/var/www/firmware/ztp/configs").resolve()
-DB_PATH = "../mnt/var/www/firmware/ztp/configs/mac_registry.sqlite"
+CONFIGS_ROOT = Path("../mnt/ztp/configs").resolve()
+DB_PATH = "../mnt/ztp/configs/mac_registry.sqlite"
 
 
 conn = sqlite3.connect(DB_PATH)

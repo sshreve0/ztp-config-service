@@ -10,7 +10,7 @@ import db
 import auth
 import uvicorn #included for testing
 
-CONFIG_DIR = "../mnt/var/www/firmware/ztp/configs"
+CONFIG_DIR = "../mnt/ztp/configs"
 
 app = FastAPI()
 
@@ -29,13 +29,11 @@ async def get_ntp_time():
     raise RuntimeError("ERROR: All NTP servers failed.")
 
 @app.put("/state")
-async def set_state( mac: str, state: str):
+async def set_state(token: Annotated[str, Depends(oauth2_scheme)], mac: str, state: str):
 
     time = await get_ntp_time()
     time = time.strftime("%Y-%m-%d_%H-%M")
-    #authenticated = auth.verify(mac, token, time)
-    print("TIME: " + time)
-    authenticated = True
+    authenticated = await auth.verify(mac, token, time)
 
     if not authenticated:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -52,8 +50,10 @@ async def set_state( mac: str, state: str):
 @app.put("/update")
 async def update_config(token: Annotated[str, Depends(oauth2_scheme)],mac: str, version: str, content: str = Body()):
 
-    time = (get_ntp_time().strftime("%Y-%m-%d_%H-%M"))
-    authenticated = auth.verify(mac, token, time)
+    time = await get_ntp_time()
+    time = time.strftime("%Y-%m-%d_%H-%M")
+
+    authenticated = await auth.verify(mac, token, time)
 
     if not authenticated:
         raise HTTPException(status_code=401, detail="Unauthorized")
@@ -78,8 +78,10 @@ async def update_config(token: Annotated[str, Depends(oauth2_scheme)],mac: str, 
 @app.get("/provision")
 async def provision_config(token: Annotated[str, Depends(oauth2_scheme)],mac: str, version: str = None):
 
-    time = get_ntp_time().strftime("%Y-%m-%d_%H-%M")
-    authenticated = auth.verify(mac, token, time)
+    time = await get_ntp_time()
+    time = time.strftime("%Y-%m-%d_%H-%M")
+
+    authenticated = await auth.verify(mac, token, time)
 
     if not authenticated:
         raise HTTPException(status_code=401, detail="Unauthorized")

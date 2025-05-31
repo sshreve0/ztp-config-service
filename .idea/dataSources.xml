@@ -1,11 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="mac_registry.sqlite" uuid="4b97f7e3-c113-4026-b386-12eb21d3afc2">
+    <data-source source="LOCAL" name="mac_registry.sqlite" uuid="ca6282ee-97fd-4c3e-a01e-67c36f4cbe35">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
-      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/../mnt/var/www/firmware/ztp/configs/mac_registry.sqlite</jdbc-url>
+      <jdbc-url>jdbc:sqlite:$PROJECT_DIR$/../mnt/ztp/configs/mac_registry.sqlite</jdbc-url>
       <working-dir>$ProjectFileDir$</working-dir>
     </data-source>
   </component>

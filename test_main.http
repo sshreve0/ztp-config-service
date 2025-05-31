@@ -27,25 +27,5 @@ Accept: application/json
 
 ###
 # test successful return of newest version
-GET https://firmware.itops.io/provision
-Accept: application/json
-
-###
-# test successful return of newest version
-GET http://38.126.155.75/provision?mac=7c8d9c14ec12
-Accept: application/json
-
-###
-# test failure to return of newest version
-GET http://192.168.30.10:85/provision?mac=123456789
-Accept: application/json
-
-###
-
-PUT http://192.168.30.10:8000/update?mac=7c8d9c14ec12&content=balls&version=0000-00-00_00-00-00
-Accept: application/json
-
-###
-# test update failure
-PUT http://192.168.30.10:8000/update?mac=1234567889&version=0000-00-00_00-00-00&content=balls
+PUT https://firmware.itops.io/state
 Accept: application/json
