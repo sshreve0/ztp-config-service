@@ -112,5 +112,6 @@ async def provision_config(token: Annotated[str, Depends(oauth2_scheme)],mac: st
 
     return response
 
+# uncomment this when testing locally without docker container
 #if __name__ == '__main__':
 #    uvicorn.run("main:app", host="0.0.0.0", port=8000, log_level="info")

@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="DataSourceManagerImpl" format="xml" multifile-model="true">
-    <data-source source="LOCAL" name="mac_registry.sqlite" uuid="ca6282ee-97fd-4c3e-a01e-67c36f4cbe35">
+    <data-source source="LOCAL" name="mac_registry.sqlite" uuid="7ff2800d-ec1b-4605-acf2-0a83e2d73916">
       <driver-ref>sqlite.xerial</driver-ref>
       <synchronize>true</synchronize>
       <jdbc-driver>org.sqlite.JDBC</jdbc-driver>
